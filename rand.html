@@ -1,0 +1,67 @@
+<html>
+<head>
+</head>
+<body>
+<script>
+function randomInt(rightBound)
+{
+    rightBound = rightBound || Number.MAX_VALUE;
+    return Math.floor(Math.random() * rightBound);
+}
+
+function randomString(size)
+{
+    var generatedString = '';
+    for(var i = 0; i < size; i++) {
+        generatedString += String.fromCharCode(randomInt(0xffff));
+    }
+
+    return generatedString;
+}
+
+function randomField(objectOrArrayLength)
+{
+    var generator = [
+        function() { return randomInt(); },
+
+        function() { return randomInt() * (Math.random() - 1); },
+
+        function() { return Math.random() < 0.5 ? true : false; },
+
+        function() { return randomString(randomInt(randomInt(10000))); },
+
+        function() { return null; },
+
+        function() { return undefined; },
+
+        function() { return NaN; },
+
+        function() { return randomObj(randomInt(objectOrArrayLength)); },
+
+        function() { return randomArray(randomInt(objectOrArrayLength)); }
+    ];
+
+    return generator[randomInt(generator.length)]();
+}
+
+function randomArray(length)
+{
+    var returnArr = [];
+    for (var i = 0; i < length; i++) {
+        returnArr.push(randomField(randomInt(length)));
+    }
+    return returnArr;
+}
+
+function randomObj(fieldCount)
+{
+    var generatedObj = {};
+
+    for(var i = 0; i < fieldCount; i++) {
+        generatedObj[randomString(8)] = randomField(fieldCount);
+    }
+    return generatedObj;
+}
+</script>
+</body>
+</html>
