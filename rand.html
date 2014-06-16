@@ -296,6 +296,11 @@ function log(type) {
     document.getElementById("log").innerHTML += "<p>" + entry + "</p>";
 }
 
+function showObject(obj)
+{
+    document.getElementById("code").innerHTML = _.escape(JSON.stringify(obj, null, "  "));
+}
+
 function randomField(len)
 {
     var generator = [
@@ -354,16 +359,24 @@ function randomField(len)
     return generator[randomInt(generator.length)]();
 }
 
-function randomInt(rightBound)
+function randomInt(rightBound, illegal)
 {
-    return Math.floor(Math.random() * rightBound);
+    var illegal = illegal || function () {return false;};
+    var candidate = Math.floor(Math.random() * rightBound);
+    return illegal(candidate) ? randomInt(rightBound, illegal) : candidate;
 }
 
 function randomString(size)
 {
+    var illegalCodes = function (code) {
+        if (code >= 0x0000 && code <= 0x001f) return true;
+        if (code >= 0x0080 && code <= 0x009f) return true;
+        return code === 0x007f;
+    };
+
     var generatedString = '';
     for(var i = 0; i < size; i++) {
-        generatedString += String.fromCharCode(randomInt(0x00ff));
+        generatedString += String.fromCharCode(randomInt(0x00ff, illegalCodes));
     }
 
     return generatedString;
@@ -395,14 +408,11 @@ function genNew()
     var fieldCount = parseInt(document.getElementById("fieldCount").value);
     var generated = generateObject(fieldCount);
     
-    codeWrap(JSON.stringify(generated));
+    showObject(generated);
     console.log(generated);
 }
 
-function codeWrap(str)
-{
-    document.getElementById("code").innerHTML = str;
-}
 </script>
+<script src="http://underscorejs.org/underscore-min.js"></script>
 </body>
 </html>
